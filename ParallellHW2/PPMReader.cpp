@@ -16,8 +16,8 @@ std::unique_ptr<PPMImage> PPMReader::read()
 		return nullptr;
 	}
 
+	// Attempt to open file in binary read mode.
 	std::ifstream file(path, std::ifstream::binary);
-
 	if (!file)
 	{
 		std::cerr << "File could not be opened." << std::endl;
@@ -35,7 +35,7 @@ std::unique_ptr<PPMImage> PPMReader::read()
 
 	// Extract the next three values from the file, excluding any comments.
 	// These values are the width, height, and size.
-	std::string header_values[PPM_HEADER_VAL_LEN];
+	uint header_values[PPM_HEADER_VAL_LEN];
 	int current_val = 0;
 	while (!file.eof())
 	{
@@ -54,47 +54,38 @@ std::unique_ptr<PPMImage> PPMReader::read()
 		}
 	}
 
-	auto image = std::make_unique<PPMImage>();
-	image->width = std::stoul(header_values[0]);
-	image->height = std::stoul(header_values[1]);
-	image->color_max_val = std::stoul(header_values[2]);
-
-	if (image->color_max_val != PPM_COLOR_MAX_VAL)
+	if (header_values[2] != PPM_COLOR_MAX_VAL)
 	{
 		std::cerr << "The color component value must be 255." << std::endl;
 		return nullptr;
 	}
 
-	std::cout << "Width: " << image->width << std::endl
-		<< "Height: " << image->height << std::endl
-		<< "Color Component: " << image->color_max_val << std::endl << std::endl;
-
-	image->data.reserve(image->width * image->height);
-
+	// Ignore empty space after color compontent size.
 	file.ignore(1, '\n');
 
-	auto pixel_buf = std::make_unique<char[]>(PPM_PIXEL_COMPS);
-	while (!file.eof())
+	uint pixels = header_values[0] * header_values[1];
+	uint pixel_bytes = pixels * PPM_PIXEL_COMPS;
+
+	// Create buffer and read remaining data.
+	auto pixel_buf = std::make_unique<char[]>(pixel_bytes);
+	file.read(pixel_buf.get(), pixel_bytes);
+
+	// Create an image to return.
+	auto image = std::make_unique<PPMImage>();
+	image->width = header_values[0];
+	image->height = header_values[1];
+	image->color_max_val = header_values[2];
+	image->data.reserve(pixels);
+
+	for (int i = 0; i < pixel_bytes; i += 3)
 	{
-		file.read(pixel_buf.get(), PPM_PIXEL_COMPS);
-		image->data.push_back({ static_cast<uchar>(pixel_buf[0]), 
-							    static_cast<uchar>(pixel_buf[1]), 
-							    static_cast<uchar>(pixel_buf[2]) });
+		image->data.emplace_back(PPMPixel{ static_cast<uchar>(pixel_buf[i]),
+										   static_cast<uchar>(pixel_buf[i + 1]),
+										   static_cast<uchar>(pixel_buf[i + 2]) });
 	}
-
-	int i = 1;
-	for (std::vector<PPMPixel>::iterator it = image->data.begin(); it != image->data.end(); ++it)
-	{
-		std::cout << "Pixel: " << i << std::endl
-			<< "\tR: " << static_cast<int>(it->red) << " G: " << static_cast<int>(it->green) << " B: " << static_cast<int>(it->blue) << std::endl;
-
-		i++;
-	}
-
-	/*std::cout << "Magic Num: " << magic_num << std::endl
-		<< "Width: " << header_values[0] << std::endl
-		<< "Height: " << header_values[1] << std::endl
-		<< "Size: " << header_values[2] << std::endl;*/
+	
+	// Clean up pixel buffer, we don't need this extra memory sitting around.
+	pixel_buf.reset();
 
 	file.close();
 
