@@ -9,10 +9,23 @@
 #define PPM_COLOR_MAX_VAL 255
 #define PPM_PIXEL_COMPS 3
 
-std::unique_ptr<PPMImage> PPMReader::read()
+#define ERR_PATH_EMPTY "No file name given."
+#define ERR_OPENING_FILE "File could not be opened."
+#define ERR_INVALID_FORM "Invalid image format. Must be a P6 PPM image."
+#define ERR_COLOR_COMP "The color component must be 255."
+
+using namespace ppm;
+
+void print_error(std::string msg)
 {
-	if (path == "")
+	std::cerr << "[ERROR] " << msg << std::endl;
+}
+
+std::unique_ptr<PPMImage> ppm::read(std::string& path)
+{
+	if (path.empty())
 	{
+		print_error(ERR_PATH_EMPTY);
 		return nullptr;
 	}
 
@@ -20,7 +33,7 @@ std::unique_ptr<PPMImage> PPMReader::read()
 	std::ifstream file(path, std::ifstream::binary);
 	if (!file)
 	{
-		std::cerr << "File could not be opened." << std::endl;
+		print_error(ERR_OPENING_FILE);
 		return nullptr;
 	}
 
@@ -29,7 +42,7 @@ std::unique_ptr<PPMImage> PPMReader::read()
 	file >> magic_num;
 	if (magic_num != PPM_BIN_MN)
 	{
-		std::cerr << "Invalid image format. Must be a P6 PPM image." << std::endl;
+		print_error(ERR_INVALID_FORM);
 		return nullptr;
 	}
 
@@ -56,7 +69,7 @@ std::unique_ptr<PPMImage> PPMReader::read()
 
 	if (header_values[2] != PPM_COLOR_MAX_VAL)
 	{
-		std::cerr << "The color component value must be 255." << std::endl;
+		print_error(ERR_COLOR_COMP);
 		return nullptr;
 	}
 
@@ -90,4 +103,20 @@ std::unique_ptr<PPMImage> PPMReader::read()
 	file.close();
 
 	return image;
+}
+
+bool ppm::write(std::unique_ptr<PPMImage> image, std::string& path)
+{
+	if (path.empty())
+	{
+		print_error(ERR_PATH_EMPTY);
+		return false;
+	}
+
+	std::ofstream file(path, std::ofstream::binary);
+	if (!file)
+	{
+		print_error(ERR_OPENING_FILE);
+		return false;
+	}
 }
