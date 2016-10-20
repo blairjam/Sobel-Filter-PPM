@@ -131,7 +131,8 @@ bool write(std::shared_ptr<PPMImage> image, std::string path)
     uint pixel_bytes = image->width * image->height * PPM_PIXEL_COMPS;
 
     // Fill a buffer with the stored pixel information.
-    auto pixel_buf = std::make_unique<char[]>(pixel_bytes);
+    //auto pixel_buf = std::make_unique<char[]>(pixel_bytes);
+	std::vector<char> pixel_buf(pixel_bytes, 0);
     int current_byte = 0;
     for (std::vector<PPMPixel>::iterator it = image->data.begin(); it != image->data.end(); ++it)
     {
@@ -143,10 +144,7 @@ bool write(std::shared_ptr<PPMImage> image, std::string path)
     }
 
     // Perform a final write to the file. This is all of the pixel data in bytes.
-    file.write(pixel_buf.get(), pixel_bytes);
-
-    // Clear the pixel buffer. We don't need it sitting around.
-    pixel_buf.reset();
+    file.write(pixel_buf.data(), pixel_bytes);
 
     file.close();
 

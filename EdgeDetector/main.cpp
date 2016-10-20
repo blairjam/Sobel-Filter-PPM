@@ -1,13 +1,17 @@
 #include <iostream>
+#include <memory>
 #include "ppmbin.h"
 #include "sobel.h"
 
 int main()
 {   
+	std::string name = "lady";
+	std::string type = ".ppm";
+
     /* READ */
     std::cout << "Reading image." << std::endl;
 
-    auto image = read("seattle.ppm");
+    auto image = read(name + type);
     if (image == nullptr)
     {
         return 1;
@@ -27,7 +31,7 @@ int main()
 
     std::cout << "Writing grayscale image to file." << std::endl;
 
-    write(image, "gray.ppm");
+    write(image, name + "_gray" + type);
 
     std::cout << "Image write successful." << std::endl;
 
@@ -43,7 +47,7 @@ int main()
 
     std::cout << "Writing image to file." << std::endl;
 
-    write(filtered, "filter.ppm");
+    write(filtered, name + "_filter" + type);
 
     std::cout << "Image write successful." << std::endl;
 
