@@ -15,15 +15,21 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PPMReader.cpp">
+    <ClCompile Include="ppmbin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sobel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="PPMReader.h">
+    <ClInclude Include="ppmbin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sobel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
