@@ -32,7 +32,7 @@ int main()
 
     std::cout << "Writing grayscale image to file." << std::endl;
 
-    write(image, name + "_gray" + type);
+   // write(image, name + "_gray" + type);
 
     std::cout << "Image write successful." << std::endl;
 
@@ -42,7 +42,7 @@ int main()
 
 	Timer filter_timer;
 	filter_timer.start();
-    auto filtered = apply_filter_serial(image);
+    auto filtered = apply_filter_parallel(image);
 	filter_timer.stop();
 
     std::cout << "Filter application successful. Time: " << filter_timer.get_elapsed_time() << std::endl;
@@ -51,7 +51,7 @@ int main()
 
     std::cout << "Writing image to file." << std::endl;
 
-    write(filtered, name + "_filter_new" + type);
+    write(filtered, name + "_filter_para" + type);
 
     std::cout << "Image write successful." << std::endl;
 
