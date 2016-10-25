@@ -2,6 +2,7 @@
 #include <memory>
 #include "ppmbin.h"
 #include "sobel.h"
+#include "Timer.h"
 
 int main()
 {   
@@ -39,9 +40,12 @@ int main()
 
     std::cout << "Applying edge detection filter." << std::endl;
 
-    auto filtered = apply_filter(image);
+	Timer filter_timer;
+	filter_timer.start();
+    auto filtered = apply_filter_serial(image);
+	filter_timer.stop();
 
-    std::cout << "Filter application successful." << std::endl;
+    std::cout << "Filter application successful. Time: " << filter_timer.get_elapsed_time() << std::endl;
 
     /* WRITE */
 
