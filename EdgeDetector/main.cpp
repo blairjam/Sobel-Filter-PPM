@@ -51,7 +51,7 @@ int main()
 
     std::cout << "Writing image to file." << std::endl;
 
-    write(filtered, name + "_filter" + type);
+    write(filtered, name + "_filter_new" + type);
 
     std::cout << "Image write successful." << std::endl;
 
